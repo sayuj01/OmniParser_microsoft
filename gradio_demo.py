@@ -61,7 +61,7 @@ def process(
     image = Image.open(io.BytesIO(base64.b64decode(dino_labled_img)))
     print('finish processing')
     parsed_content_list = '\n'.join(parsed_content_list)
-    return image, str(parsed_content_list)
+    return image, str(parsed_content_list), str(label_coordinates)
 
 
 
@@ -86,6 +86,7 @@ with gr.Blocks() as demo:
         with gr.Column():
             image_output_component = gr.Image(type='pil', label='Image Output')
             text_output_component = gr.Textbox(label='Parsed screen elements', placeholder='Text Output')
+            text_coordinates_output_component = gr.Textbox(label='Coordinates')
 
     submit_button_component.click(
         fn=process,
@@ -96,7 +97,7 @@ with gr.Blocks() as demo:
             use_paddleocr_component,
             imgsz_component
         ],
-        outputs=[image_output_component, text_output_component]
+        outputs=[image_output_component, text_output_component, text_coordinates_output_component]
     )
 
 # demo.launch(debug=False, show_error=True, share=True)
