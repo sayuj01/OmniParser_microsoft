@@ -23,6 +23,7 @@ Install environment for droplet with Ubuntu:
 sudo apt update
 wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh -O miniconda.sh
 bash miniconda.sh
+/root/miniconda3/bin/conda init
 
 source ~/.bashrc
 conda create -n "omni" python==3.12
