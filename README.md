@@ -30,6 +30,11 @@ conda create -n "omni" python==3.12
 conda activate omni
 ```
 
+Git clone the repo:
+```python
+git clone https://github.com/sayuj01/OmniParser_microsoft.git
+cd OmniParser_microsoft
+
 Then just run the sh file
  
 ```python
