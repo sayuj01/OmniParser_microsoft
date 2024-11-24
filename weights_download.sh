@@ -27,7 +27,8 @@ echo "All required model and configuration files downloaded and organised."
 
 # Run the conversion script if necessary files are present
 if [ -f "weights/icon_detect/model.safetensors" ] && [ -f "weights/icon_detect/model.yaml" ]; then
-  python weights/convert_safetensor_to_pt.py
+  cd weights
+  python convert_safetensor_to_pt.py
   echo "Conversion to best.pt completed."
 else
   echo "Error: Required files for conversion not found."
