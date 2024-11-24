@@ -19,7 +19,7 @@
 
 ## Install 
 Install environment for droplet with Ubuntu:
-```python
+```bash
 sudo apt update
 wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh -O miniconda.sh
 bash miniconda.sh
@@ -31,13 +31,14 @@ conda activate omni
 ```
 
 Git clone the repo:
-```python
+```bash
 git clone https://github.com/sayuj01/OmniParser_microsoft.git
 cd OmniParser_microsoft
+```
 
 Then just run the sh file
  
-```python
+```bash
 chmod +x master.sh
 bash master.sh
 ```
