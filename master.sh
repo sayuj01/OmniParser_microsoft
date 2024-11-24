@@ -1,11 +1,5 @@
 #!/bin/bash
 
-# Clone the OmniParser repository
-git clone https://github.com/microsoft/OmniParser.git
-
-# Navigate into the OmniParser directory
-cd OmniParser || { echo "Failed to change directory to OmniParser"; exit 1; }
-
 # Install the required Python dependencies
 pip install -r requirements.txt
 
