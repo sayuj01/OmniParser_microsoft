@@ -23,7 +23,7 @@ Install environment for droplet with Ubuntu:
 sudo apt update
 wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh -O miniconda.sh
 bash miniconda.sh
-sudo apt-get install libgl1-mesa-glx
+sudo apt-get install -y mesa-utils
 
 /root/miniconda3/bin/conda init
 source ~/.bashrc
