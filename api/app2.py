@@ -1,5 +1,26 @@
+import sys
+import os
+from pathlib import Path
 
+# Add the parent directory to Python path to find utils module
+current_dir = Path(__file__).resolve().parent
+parent_dir = current_dir.parent
+sys.path.append(str(parent_dir))
 
+import uuid
+from flask import Flask, request, jsonify
+from PIL import Image
+import io
+import base64
+from utils import check_ocr_box, get_yolo_model, get_caption_model_processor, get_som_labeled_img
+import logging
+import traceback
+
+# Initialize models
+yolo_model = get_yolo_model(model_path='../weights/icon_detect/best.pt')
+caption_model_processor = get_caption_model_processor(model_name="florence2", model_name_or_path="../weights/icon_caption_florence")
+
+app = Flask(__name__)
 
 @app.route('/process', methods=['POST'])
 def process_request():
