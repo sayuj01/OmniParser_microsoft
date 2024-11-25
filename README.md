@@ -51,7 +51,7 @@ We put together a few simple examples in the demo.ipynb.
 ##Flash API
 ```
 cd api
-pip -r requirements.txt
+pip install -r requirements.txt
 python app.py
 ```
 
