@@ -42,6 +42,46 @@ from torchvision.transforms import ToPILImage
 import supervision as sv
 import torchvision.transforms as T
 
+from threading import Lock
+import gc
+import logging
+
+ocr_lock = Lock()
+
+
+def retry_paddleocr(image_path, retries=3):
+    """Retry mechanism for PaddleOCR to handle transient errors."""
+    for attempt in range(retries):
+        try:
+            # Create a fresh PaddleOCR instance for each attempt
+            paddle_ocr_instance = PaddleOCR(
+                lang='en',
+                use_angle_cls=False,
+                use_gpu=False,
+                show_log=False,
+                max_batch_size=512,
+                rec_batch_num=512,
+                use_dilation=True,
+                det_db_score_mode='slow'
+            )
+            with ocr_lock:  # Ensure thread-safe access to PaddleOCR
+                return paddle_ocr_instance.ocr(image_path, cls=False)[0]
+        except RuntimeError as e:
+            logging.error(f"Retry {attempt + 1} failed for image {image_path}: {e}")
+            if attempt == retries - 1:
+                raise
+        finally:
+            gc.collect()
+
+def validate_image(image_path):
+    """Ensure the image is accessible and readable."""
+    try:
+        with Image.open(image_path) as img:
+            img.verify()  # Check if the image is valid
+        logging.info(f"Image {image_path} is valid and ready for OCR.")
+    except Exception as e:
+        logging.error(f"Invalid or unreadable image {image_path}: {e}")
+        raise IOError(f"Image validation failed for {image_path}: {e}")
 
 def get_caption_model_processor(model_name, model_name_or_path="Salesforce/blip2-opt-2.7b", device=None):
     if not device:
@@ -381,38 +421,37 @@ def get_xywh_yolo(input):
     
 
 
-def check_ocr_box(image_path, display_img = True, output_bb_format='xywh', goal_filtering=None, easyocr_args=None, use_paddleocr=False):
+def check_ocr_box(image_path, display_img=True, output_bb_format='xywh', goal_filtering=None, easyocr_args=None, use_paddleocr=False):
+    """Perform OCR using PaddleOCR or EasyOCR."""
     if use_paddleocr:
-        result = paddle_ocr.ocr(image_path, cls=False)[0]
-        coord = [item[0] for item in result]
-        text = [item[1][0] for item in result]
+        logging.info(f"Processing image with PaddleOCR: {image_path}")
+        try:
+            result = retry_paddleocr(image_path)
+        except Exception as e:
+            logging.error(f"PaddleOCR failed for image {image_path}: {e}")
+            raise
     else:  # EasyOCR
+        logging.info(f"Processing image with EasyOCR: {image_path}")
         if easyocr_args is None:
             easyocr_args = {}
         result = reader.readtext(image_path, **easyocr_args)
-        # print('goal filtering pred:', result[-5:])
-        coord = [item[0] for item in result]
-        text = [item[1] for item in result]
-    # read the image using cv2
+
+    coord = [item[0] for item in result]
+    text = [item[1][0] if use_paddleocr else item[1] for item in result]
+
     if display_img:
         opencv_img = cv2.imread(image_path)
         opencv_img = cv2.cvtColor(opencv_img, cv2.COLOR_RGB2BGR)
-        bb = []
         for item in coord:
             x, y, a, b = get_xywh(item)
-            # print(x, y, a, b)
-            bb.append((x, y, a, b))
-            cv2.rectangle(opencv_img, (x, y), (x+a, y+b), (0, 255, 0), 2)
-        
-        # Display the image
+            cv2.rectangle(opencv_img, (x, y), (x + a, y + b), (0, 255, 0), 2)
         plt.imshow(opencv_img)
+
+    if output_bb_format == 'xywh':
+        bb = [get_xywh(item) for item in coord]
+    elif output_bb_format == 'xyxy':
+        bb = [get_xyxy(item) for item in coord]
     else:
-        if output_bb_format == 'xywh':
-            bb = [get_xywh(item) for item in coord]
-        elif output_bb_format == 'xyxy':
-            bb = [get_xyxy(item) for item in coord]
-        # print('bounding box!!!', bb)
+        bb = []
+
     return (text, bb), goal_filtering
-
-
-
