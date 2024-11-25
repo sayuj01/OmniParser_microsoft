@@ -56,6 +56,9 @@ python app.py
 ```
 
 ## Gunicorn for concurrent requests
+
+Choose workers based on the number of CPU cores.
+
 ```
 gunicorn app:app --workers=4 --threads=1 --bind 0.0.0.0:8000
 
