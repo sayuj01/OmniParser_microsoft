@@ -48,6 +48,18 @@ bash master.sh
 ## Examples:
 We put together a few simple examples in the demo.ipynb. 
 
+##Flash API
+```
+cd api
+pip -r requirements.txt
+python app.py
+```
+
+##Gunicorn for concurrent requests
+```
+gunicorn app:app --workers=4 --threads=1 --bind 0.0.0.0:8000
+```
+
 ## Gradio Demo
 To run gradio demo, simply run:
 ```python
