@@ -2,3 +2,4 @@ flask
 flask-limiter
 python-dotenv
 pillow
+gunicorn
