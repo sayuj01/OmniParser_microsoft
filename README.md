@@ -48,16 +48,18 @@ bash master.sh
 ## Examples:
 We put together a few simple examples in the demo.ipynb. 
 
-##Flash API
+## Flash API
 ```
 cd api
 pip install -r requirements.txt
 python app.py
 ```
 
-##Gunicorn for concurrent requests
+## Gunicorn for concurrent requests
 ```
 gunicorn app:app --workers=4 --threads=1 --bind 0.0.0.0:8000
+
+gunicorn app2:app --workers=4 --threads=1 --bind 0.0.0.0:8000 #for better api output
 ```
 
 ## Gradio Demo
